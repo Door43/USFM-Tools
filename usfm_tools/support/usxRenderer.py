@@ -410,6 +410,9 @@ class USXRenderer(abstractRenderer.AbstractRenderer):
     def renderFQA(self, token):
         self.f.write(self.stop_c() + '\n  <char style="fqa">' + self.escape(token.value) + '</char>')
 
+    def renderFQAE(self, token):
+        pass
+
     def renderFQB(self, token):
         self.f.write(self.stop_c() + '\n  <char style="fqb">' + self.escape(token.value) + '</char>')
 
