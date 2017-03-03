@@ -1,5 +1,8 @@
 .DS_Store
 *.pyc
-.idea/*
+.idea/
 *.iml
 docs/translation/*
+*.egg-info/
+build/
+dist/
