@@ -515,6 +515,9 @@ class USXRenderer(abstractRenderer.AbstractRenderer):
     def render_imt3(self, token):
         self.f.write(self.stop_all() + '\n<para style="imt3">' + token.value.upper() + '</para>')
 
+    def renderD(self, token):
+        self.f.write(self.stop_all() + '\n<para style="d">' + token.value + '</para>')
+
     def renderUnknown(self, token):
         if token.value == 'v':
             self.currentV = int(self.currentV) + 1
