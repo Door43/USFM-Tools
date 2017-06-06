@@ -35,6 +35,7 @@ plus = Literal("+")
 
 textBlock = Group(Optional(NoMatch(), "text") + phrase)
 unknown = Group(Optional(NoMatch(), "unknown") + Suppress(backslash) + CharsNotIn(u' \n\t\\'))
+escape = usfmTokenValue("\\", phrase)
 
 id_token = usfmTokenValue("id", phrase)
 ide = usfmTokenValue("ide", phrase)
@@ -315,6 +316,7 @@ element = MatchFirst([ide, id_token, sts, h, toc, toc1, toc2, toc3, mt, mt1, mt2
                       tcr5,
                       tcr6,
                       textBlock,
+                      escape,
                       unknown])
 
 usfm = OneOrMore(element)
@@ -336,7 +338,13 @@ def clean(unicodeString):
     # We need to clean the input a bit. For a start, until
     # we work out what to do, non breaking spaces will be ignored
     # ie 0xa0
-    return unicodeString.replace(u'\xa0', ' ')
+    ret_value = unicodeString.replace(u'\xa0', ' ')
+
+    # replace illegal USFM sequences
+    ret_value = ret_value.replace(u'\\ ', "\\\\ ")
+    ret_value = ret_value.replace(u'\\\n', "\\\\\n")
+    ret_value = ret_value.replace(u'\\\r', "\\\\\r")
+    return ret_value
 
 
 def createToken(t):
@@ -430,7 +438,7 @@ def createToken(t):
         'm': MToken,
         'tl': TLSToken,
         'tl*': TLEToken,
-        '\\\\': PBRToken,
+        '\\\\': EscapedToken,
         'rem': REMToken,
         'tr': TRToken,
         'th1': TH1Token,
@@ -760,6 +768,13 @@ class UsfmToken(object):
 class UnknownToken(UsfmToken):
     def renderOn(self, printer):
         return printer.renderUnknown(self)
+
+    def isUnknown(self): return True
+
+class EscapedToken(UsfmToken):
+    def renderOn(self, printer):
+        self.value = '\\'
+        return printer.renderTEXT(self)
 
     def isUnknown(self): return True
 
