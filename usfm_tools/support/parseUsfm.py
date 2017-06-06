@@ -341,9 +341,10 @@ def clean(unicodeString):
     ret_value = unicodeString.replace(u'\xa0', ' ')
 
     # escape illegal USFM sequences
-    ret_value = ret_value.replace(u'\\ ', "\\\\ ")
+    ret_value = ret_value.replace(u'\\ ',  "\\\\ ")
     ret_value = ret_value.replace(u'\\\n', "\\\\\n")
     ret_value = ret_value.replace(u'\\\r', "\\\\\r")
+    ret_value = ret_value.replace(u'\\\t', "\\\\\t")
     return ret_value
 
 
