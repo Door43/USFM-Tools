@@ -340,7 +340,7 @@ def clean(unicodeString):
     # ie 0xa0
     ret_value = unicodeString.replace(u'\xa0', ' ')
 
-    # replace illegal USFM sequences
+    # escape illegal USFM sequences
     ret_value = ret_value.replace(u'\\ ', "\\\\ ")
     ret_value = ret_value.replace(u'\\\n', "\\\\\n")
     ret_value = ret_value.replace(u'\\\r', "\\\\\r")
