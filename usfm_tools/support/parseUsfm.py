@@ -345,6 +345,12 @@ def clean(unicodeString):
     ret_value = ret_value.replace('\\\n', '\\\\\n')
     ret_value = ret_value.replace('\\\r', '\\\\\r')
     ret_value = ret_value.replace('\\\t', '\\\\\t')
+
+    # check edge case if backslash is at end of line
+    l = len(ret_value)
+    if (l > 0) and (ret_value[l-1] == '\\'):
+        ret_value += '\\' # escape it
+
     return ret_value
 
 
