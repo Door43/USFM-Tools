@@ -1,4 +1,4 @@
-from __future__ import absolute_import
+from __future__ import absolute_import, unicode_literals
 import unittest
 import tempfile
 import os
@@ -43,6 +43,8 @@ class TestSinglehtmlRender(unittest.TestCase):
         soup = BeautifulSoup(converted_html, 'html.parser')
         verse_count = len(soup.select("span[class^=v-num]"))
         self.assertEqual(verse_count, 315)
+        nbsp = converted_html.find('\xa0')
+        self.assertTrue(nbsp < 0,"'\\xa0' should not be in text")
 
 if __name__ == "__main__":
     unittest.main()
