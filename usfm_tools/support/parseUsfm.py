@@ -338,13 +338,13 @@ def clean(unicodeString):
     # We need to clean the input a bit. For a start, until
     # we work out what to do, non breaking spaces will be ignored
     # ie 0xa0
-    ret_value = unicodeString.replace(u'\xa0', ' ')
+    ret_value = unicodeString.replace('\xa0', ' ')
 
     # escape illegal USFM sequences
-    ret_value = ret_value.replace(u'\\ ',  "\\\\ ")
-    ret_value = ret_value.replace(u'\\\n', "\\\\\n")
-    ret_value = ret_value.replace(u'\\\r', "\\\\\r")
-    ret_value = ret_value.replace(u'\\\t', "\\\\\t")
+    ret_value = ret_value.replace('\\ ',  '\\\\ ')
+    ret_value = ret_value.replace('\\\n', '\\\\\n')
+    ret_value = ret_value.replace('\\\r', '\\\\\r')
+    ret_value = ret_value.replace('\\\t', '\\\\\t')
     return ret_value
 
 
