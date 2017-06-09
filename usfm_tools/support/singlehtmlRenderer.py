@@ -183,14 +183,14 @@ class SingleHTMLRenderer(abstractRenderer.AbstractRenderer):
         self.writeFootnotes()
         self.footnote_num = 1
         self.cc = token.value.zfill(3)
-        #self.write(self.stopLI() + u'\n\n<h2 id="ch-'+self.cc+u'" class="c-num">'+self.chapterLabel+' ' + token.value + u'</h2>')
-        self.write(self.stopLI() + u'\n\n<h2 class="c-num">'+self.chapterLabel+' ' + token.value + u'</h2>')
+        self.write(self.stopLI() + u'\n\n<h2 id="{0}-ch-{1}" class="c-num">{2} {3}</h2>'
+                   .format(self.cb, self.cc, self.chapterLabel, token.value))
 
     def renderV(self, token):
         self.closeFootnote()
         self.cv = token.value.zfill(3)
-        #self.write(u' <span id="ch-'+self.cc+u'-v-'+self.cv+u'" class="v-num"><sup><b>' + token.value + u'</b></sup></span>')
-        self.write(u' <span class="v-num"><sup><b>' + token.value + u'</b></sup></span>')
+        self.write(u' <span id="{0}-ch-{1}-v-{2}" class="v-num"><sup><b>{3}</b></sup></span>'.
+                   format(self.cb, self.cc, self.cv, token.value))
 
     def renderWJS(self, token):
         self.write(u'<span class="woc">')

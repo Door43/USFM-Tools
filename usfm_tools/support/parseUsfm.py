@@ -35,6 +35,7 @@ plus = Literal("+")
 
 textBlock = Group(Optional(NoMatch(), "text") + phrase)
 unknown = Group(Optional(NoMatch(), "unknown") + Suppress(backslash) + CharsNotIn(u' \n\t\\'))
+escape = usfmTokenValue("\\", phrase)
 
 id_token = usfmTokenValue("id", phrase)
 ide = usfmTokenValue("ide", phrase)
@@ -315,6 +316,7 @@ element = MatchFirst([ide, id_token, sts, h, toc, toc1, toc2, toc3, mt, mt1, mt2
                       tcr5,
                       tcr6,
                       textBlock,
+                      escape,
                       unknown])
 
 usfm = OneOrMore(element)
@@ -336,7 +338,20 @@ def clean(unicodeString):
     # We need to clean the input a bit. For a start, until
     # we work out what to do, non breaking spaces will be ignored
     # ie 0xa0
-    return unicodeString.replace(u'\xa0', ' ')
+    ret_value = unicodeString.replace('\xa0', ' ')
+
+    # escape illegal USFM sequences
+    ret_value = ret_value.replace('\\ ',  '\\\\ ')
+    ret_value = ret_value.replace('\\\n', '\\\\\n')
+    ret_value = ret_value.replace('\\\r', '\\\\\r')
+    ret_value = ret_value.replace('\\\t', '\\\\\t')
+
+    # check edge case if backslash is at end of line
+    l = len(ret_value)
+    if (l > 0) and (ret_value[l-1] == '\\'):
+        ret_value += '\\' # escape it
+
+    return ret_value
 
 
 def createToken(t):
@@ -430,7 +445,7 @@ def createToken(t):
         'm': MToken,
         'tl': TLSToken,
         'tl*': TLEToken,
-        '\\\\': PBRToken,
+        '\\\\': EscapedToken,
         'rem': REMToken,
         'tr': TRToken,
         'th1': TH1Token,
@@ -760,6 +775,13 @@ class UsfmToken(object):
 class UnknownToken(UsfmToken):
     def renderOn(self, printer):
         return printer.renderUnknown(self)
+
+    def isUnknown(self): return True
+
+class EscapedToken(UsfmToken):
+    def renderOn(self, printer):
+        self.value = '\\'
+        return printer.renderTEXT(self)
 
     def isUnknown(self): return True
 
