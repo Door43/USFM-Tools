@@ -4,7 +4,7 @@
 from __future__ import print_function, unicode_literals
 import abstractRenderer
 import codecs
-
+import logging
 
 #
 #   Simplest renderer. Ignores everything except ascii text.
@@ -32,11 +32,12 @@ class USXRenderer(abstractRenderer.AbstractRenderer):
                              'cell': False, 'table': False}
         # Errors
         self.error = ''
+        self.__logger = logging.getLogger('usfm_tools')
 
     def render(self):
         self.loadUSFM(self.inputDir)
         if self.byBook:
-            print('#### Creating One File Per Book\n')
+            self.__logger.info('Creating One File Per Book\n')
             for bookName in self.booksUsfm:
                 self.f = codecs.open(self.outputFilePath + bookName + self.outputFileExt, 'w', 'utf_8_sig')
                 self.renderBook = bookName
@@ -44,15 +45,15 @@ class USXRenderer(abstractRenderer.AbstractRenderer):
                 self.f.write(self.stop_all())
                 self.f.close()
         else:
-            print('#### Concatenating Books into ' + self.outputFileName + self.outputFileExt + '\n')
+            self.__logger.info('Concatenating Books into ' + self.outputFileName + self.outputFileExt + '\n')
             self.f = codecs.open(self.outputFilePath + self.outputFileName + self.outputFileExt, 'w', 'utf_8_sig')
             self.run()
             self.f.write(self.stop_p() + self.stop_pi() + self.stop_pi2() + self.stop_q() + self.stop_li())
             self.f.close()
-        print('')
+        self.__logger.info('')
 
     def writeLog(self, s):
-        print(s)
+        self.__logger.info(s)
 
     # Support
 
@@ -521,5 +522,5 @@ class USXRenderer(abstractRenderer.AbstractRenderer):
     def renderUnknown(self, token):
         if token.value == 'v':
             self.currentV = int(self.currentV) + 1
-        print('     Error: ' + self.renderBook + ' ' + str(self.currentC) + ':' + str(self.currentV) +
+        self.__logger.error(self.renderBook + ' ' + str(self.currentC) + ':' + str(self.currentV) +
               ' - Unknown Token: \\' + self.escape(token.value))

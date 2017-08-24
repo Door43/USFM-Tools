@@ -5,7 +5,9 @@ from __future__ import print_function, unicode_literals
 import sys
 from pyparsing import Word, OneOrMore, nums, Literal, White, Group, Suppress, NoMatch, Optional, \
     CharsNotIn, MatchFirst
+import logging
 
+__logger = logging.getLogger('usfm_tools')
 
 def usfmToken(key):
     return Group(Suppress(backslash) + Literal(key) + Suppress(White()))
@@ -328,8 +330,8 @@ def parseString(unicodeString):
         cleaned = clean(unicodeString)
         tokens = usfm.parseString(cleaned, parseAll=True)
     except Exception as e:
-        print(e)
-        print(repr(unicodeString[:50]))
+        __logger.error(e)
+        __logger.error(repr(unicodeString[:50]))
         sys.exit()
     return [createToken(t) for t in tokens]
 

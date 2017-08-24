@@ -3,6 +3,9 @@
 
 from __future__ import print_function, unicode_literals
 import os
+import logging
+
+__logger = logging.getLogger('usfm_tools')
 
 bookKeys = {
     'GEN': '001',
@@ -363,7 +366,7 @@ def bookName(usfm):
 def loadBooks(path):
     loaded_books = {}
     dirList = os.listdir(path)
-    print('\n     LOADING ALL USFM FILES FROM ' + path)
+    __logger.info('LOADING ALL USFM FILES FROM ' + path)
     for fname in dirList:
 
         full_file_name = os.path.join(path, fname)
@@ -382,10 +385,10 @@ def loadBooks(path):
                 loaded_books[bookID(usfm)] = usfm
                 f.close()
             else:
-                print('     Ignored ' + fname)
+                __logger.info('Ignored ' + fname)
         except:
-            print("     Couldn't open " + fname)
-    print('     FINISHED LOADING\n')
+            __logger.warning("Couldn't open " + fname)
+    __logger.info('FINISHED LOADING\n')
     return loaded_books
 
 
