@@ -2,6 +2,7 @@ from __future__ import print_function, unicode_literals
 import getopt
 import sys
 import os
+import logging
 from subprocess import Popen, PIPE
 from usfm_tools.support import loutRenderer, contextRenderer, htmlRenderer, singlehtmlRenderer, csvRenderer, \
     readerise, mdRenderer, asciiRenderer, usxRenderer, mediawikiPrinter
@@ -10,21 +11,22 @@ from usfm_tools.support import loutRenderer, contextRenderer, htmlRenderer, sing
 class UsfmTransform(object):
 
     savedCWD = ''
+    __logger = logging.getLogger('usfm_tools')
 
     @staticmethod
     def runscriptold(c, prefix=''):
-        print(prefix + ':: ' + c)
+        UsfmTransform.__logger.info(prefix + ':: ' + c)
         pp = Popen(c, shell=True, stdout=PIPE, stderr=PIPE, stdin=PIPE)
         for ln in pp.stdout:
-            print(prefix + ln[:-1])
+            UsfmTransform.__logger.info(prefix + ln[:-1])
 
     @staticmethod
     def runscript(c, prefix='', repeatFilter=''):
-        print(prefix + ':: ' + c)
+        UsfmTransform.__logger.info(prefix + ':: ' + c)
         pp = Popen([c], shell=True, stdout=PIPE, stderr=PIPE, stdin=PIPE)
         (result, stderrdata) = pp.communicate()
-        print(result)
-        print(stderrdata)
+        UsfmTransform.__logger.info(result)
+        UsfmTransform.__logger.info(stderrdata)
         if not repeatFilter == '' and not stderrdata.find(repeatFilter) == -1:
             UsfmTransform.runscript(c, prefix, repeatFilter)
 
@@ -45,40 +47,40 @@ class UsfmTransform(object):
 
     @staticmethod
     def buildLout(usfmDir, builtDir, buildName):
-        print('#### Building Lout...')
+        UsfmTransform.__logger.info('Building Lout...')
 
         # Prepare
-        print('     Clean working dir')
+        UsfmTransform.__logger.info('Clean working dir')
         UsfmTransform.runscript('rm "' + builtDir + '/working/lout/*"', '       ')
 
         # Convert to Lout
-        print('     Converting to Lout')
+        UsfmTransform.__logger.info('Converting to Lout')
         UsfmTransform.ensureOutputDir(builtDir + '/working/lout')
         c = loutRenderer.LoutRenderer(usfmDir, builtDir + '/working/lout/' + buildName + '.lout')
         c.render()
 
         # Run Lout
-        print('     Copying support files')
+        UsfmTransform.__logger.info('Copying support files')
         UsfmTransform.runscript('cp support/lout/oebbook working/lout', '       ')
-        print('     Running Lout')
+        UsfmTransform.__logger.info('Running Lout')
         UsfmTransform.runscript('cd "' + builtDir + '/working/lout"; lout "./' + buildName + '.lout" > "' + buildName +
                                 '.ps"', '       ',
                                 repeatFilter='unresolved cross reference')
-        print('     Running ps2pdf')
+        UsfmTransform.__logger.info('Running ps2pdf')
         UsfmTransform.runscript(
             'cd "' + builtDir + '/working/lout"; ps2pdf -dDEVICEWIDTHPOINTS=432 -dDEVICEHEIGHTPOINTS=648 "' +
             buildName + '.ps" "' + buildName + '.pdf" ',
             '       ')
-        print('     Copying into builtDir')
+        UsfmTransform.__logger.info('Copying into builtDir')
         UsfmTransform.runscript('cp "' + builtDir + '/working/lout/' + buildName + '.pdf" "' + builtDir + '/' +
                                 buildName + '.pdf" ', '       ')
 
     @staticmethod
     def buildConTeXt(usfmDir, builtDir, buildName):
-        print('#### Building PDF via ConTeXt...')
+        UsfmTransform.__logger.info('Building PDF via ConTeXt...')
 
         # Convert to ConTeXt
-        print('     Converting to ConTeXt...')
+        UsfmTransform.__logger.info('Converting to ConTeXt...')
         # c = texise.TransformToContext()
         # c.setupAndRun(usfmDir, 'working/tex', buildName)
         UsfmTransform.ensureOutputDir(builtDir + '/working/tex')
@@ -89,7 +91,7 @@ class UsfmTransform(object):
     @staticmethod
     def buildWeb(usfmDir, builtDir, buildName, oebFlag=False):
         # Convert to HTML
-        print('#### Building Web HTML...')
+        UsfmTransform.__logger.info('Building Web HTML...')
         UsfmTransform.ensureOutputDir(builtDir + '/' + buildName + '_html')
         c = htmlRenderer.HTMLRenderer(usfmDir, builtDir + '/' + buildName + '_html', oebFlag)
         c.render()
@@ -97,7 +99,7 @@ class UsfmTransform(object):
     @staticmethod
     def buildSingleHtml(usfmDir, builtDir, buildName):
         # Convert to HTML
-        print('#### Building Single Page HTML...')
+        UsfmTransform.__logger.info('Building Single Page HTML...')
         UsfmTransform.ensureOutputDir(builtDir)
         c = singlehtmlRenderer.SingleHTMLRenderer(usfmDir, builtDir + '/' + buildName + '.html')
         c.render()
@@ -105,7 +107,7 @@ class UsfmTransform(object):
     @staticmethod
     def buildCSV(usfmDir, builtDir, buildName):
         # Convert to CSV
-        print('#### Building CSV...')
+        UsfmTransform.__logger.info('Building CSV...')
         UsfmTransform.ensureOutputDir(builtDir)
         c = csvRenderer.CSVRenderer(usfmDir, builtDir + '/' + buildName + '.csv')
         c.render()
@@ -113,7 +115,7 @@ class UsfmTransform(object):
     @staticmethod
     def buildReader(usfmDir, builtDir, buildName):
         # Convert to HTML for online reader
-        print('#### Building for Reader...')
+        UsfmTransform.__logger.info('Building for Reader...')
         UsfmTransform.ensureOutputDir(builtDir + 'en_oeb')
         c = readerise.TransformForReader()
         c.setupAndRun(usfmDir, builtDir + 'en_oeb')
@@ -121,7 +123,7 @@ class UsfmTransform(object):
     @staticmethod
     def buildMarkdown(usfmDir, builtDir, buildName):
         # Convert to Markdown for Pandoc
-        print('#### Building for Markdown...')
+        UsfmTransform.__logger.info('Building for Markdown...')
         UsfmTransform.ensureOutputDir(builtDir)
         c = mdRenderer.MarkdownRenderer(usfmDir, builtDir + '/' + buildName + '.md')
         c.render()
@@ -129,7 +131,7 @@ class UsfmTransform(object):
     @staticmethod
     def buildASCII(usfmDir, builtDir, buildName):
         # Convert to ASCII
-        print('#### Building for ASCII...')
+        UsfmTransform.__logger.info('Building for ASCII...')
         UsfmTransform.ensureOutputDir(builtDir)
         c = asciiRenderer.ASCIIRenderer(usfmDir, builtDir + '/' + buildName + '.txt')
         c.render()
@@ -137,7 +139,7 @@ class UsfmTransform(object):
     @staticmethod
     def buildUSX(usfmDir, builtDir, buildName, byBookFlag):
         # Convert to USX
-        print('#### Building for USX...')
+        UsfmTransform.__logger.info('Building for USX...')
         UsfmTransform.ensureOutputDir(builtDir)
         c = usxRenderer.USXRenderer(usfmDir, builtDir + '/', buildName, byBookFlag)
         c.render()
@@ -145,7 +147,7 @@ class UsfmTransform(object):
     @staticmethod
     def buildMediawiki(usfmDir, builtDir, buildName):
         # Convert to MediaWiki format for Door43
-        print('#### Building for Mediawiki...')
+        UsfmTransform.__logger.info('Building for Mediawiki...')
         # Check output directory
         UsfmTransform.ensureOutputDir(builtDir + '/mediawiki')
         mediawikiPrinter.Transform().setupAndRun(usfmDir, builtDir + '/mediawiki')
@@ -175,7 +177,7 @@ class UsfmTransform(object):
         usfm_dir = ''
         build_name = ''
 
-        print('#### Starting Build.')
+        UsfmTransform.__logger.info('Starting Build.')
         try:
             opts, args = getopt.getopt(argv, "sht:u:b:n:o",
                                        ["setup", "help", "target=", "usfmDir=", "builtDir=", "name=", "oeb",
@@ -230,7 +232,7 @@ class UsfmTransform(object):
         else:
             UsfmTransform.usage()
 
-        print('#### Finished.')
+            UsfmTransform.__logger.info('Finished.')
         UsfmTransform.restoreCWD()
 
     @staticmethod
