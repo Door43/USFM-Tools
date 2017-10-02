@@ -75,14 +75,15 @@ q1 = usfmToken("q1")
 q2 = usfmToken("q2")
 q3 = usfmToken("q3")
 q4 = usfmToken("q4")
-qa = usfmToken("qa")
+qa = usfmTokenValue("qa", phrase)
 qac = usfmToken("qac")
+qace = usfmEndToken("qac")
 qc = usfmToken("qc")
 qm = usfmToken("qm")
 qm1 = usfmToken("qm1")
 qm2 = usfmToken("qm2")
 qm3 = usfmToken("qm3")
-qr = usfmToken("qr")
+qr = usfmTokenValue("qr", phrase)
 qss = usfmToken("qs")
 qse = usfmEndToken("qs")
 qts = usfmToken("qt")
@@ -98,7 +99,7 @@ fk = usfmTokenValue("fk", phrase)
 ft = usfmTokenValue("ft", phrase)
 fq = usfmTokenValue("fq", phrase)
 fqa = usfmTokenValue("fqa", phrase)
-fqae = usfmEndToken("fqa")
+fqae = usfmTokenValue("fqa*", phrase)
 fqb = usfmTokenValue("fqb", phrase)
 fe = usfmEndToken("f")
 fp = usfmToken("fp")
@@ -229,6 +230,7 @@ element = MatchFirst([ide, id_token, sts, h, toc, toc1, toc2, toc3, mt, mt1, mt2
                       q4,
                       qa,
                       qac,
+                      qace,
                       qc,
                       qm,
                       qm1,
@@ -396,6 +398,7 @@ def createToken(t):
         'q4': Q4Token,
         'qa': QAToken,
         'qac': QACToken,
+        'qac*': QACEToken,
         'qc': QCToken,
         'qm': QMToken,
         'qm1': QM1Token,
@@ -588,6 +591,8 @@ class UsfmToken(object):
     def isQA(self): return False
 
     def isQAC(self): return False
+
+    def isQACE(self): return False
 
     def isQC(self): return False
 
@@ -1046,6 +1051,13 @@ class QACToken(UsfmToken):
         return printer.renderQAC(self)
 
     def isQAC(self): return True
+
+
+class QACEToken(UsfmToken):
+    def renderOn(self, printer):
+        return printer.renderQACE(self)
+
+    def isQACE(self): return True
 
 
 class QCToken(UsfmToken):

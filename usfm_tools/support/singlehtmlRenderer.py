@@ -262,13 +262,13 @@ class SingleHTMLRenderer(abstractRenderer.AbstractRenderer):
         self.write(u'<br />')
 
     def renderQSS(self, token):
-        self.write(u'<i>')
+        self.write(u'<i class="quote selah" style="float:right;">')
 
     def renderQSE(self, token):
         self.write(u'</i>')
 
     def renderEMS(self, token):
-        self.write(u'<i>')
+        self.write(u'<i class="emphasis">')
 
     def renderEME(self, token):
         self.write(u'</i>')
@@ -311,7 +311,7 @@ class SingleHTMLRenderer(abstractRenderer.AbstractRenderer):
         self.chapterLabel = token.value
 
     def renderQR(self, token):
-        self.write(u'')
+        self.write(u'<i class="quote right" style="display:block;float:right;">'+token.value+'</i>')
 
     def renderFQA(self, token):
         self.footnote_text += u'<i>'+token.value
@@ -349,4 +349,13 @@ class SingleHTMLRenderer(abstractRenderer.AbstractRenderer):
                                   footnote['footnote'], footnote['text']))
             self.write(u'</div>')
         self.footnotes = {}
+
+    def renderQA(self, token):
+        self.write('<p class="quote acrostic heading" style="text-align:center;text-style:italic;">'+token.value+'</p>')
+
+    def renderQAC(self, token):
+        self.write('<i class="quote acrostic character">')
+
+    def renderQACE(self,token):
+        self.write('</i>')
 
