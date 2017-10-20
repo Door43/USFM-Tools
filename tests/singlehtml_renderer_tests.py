@@ -80,5 +80,24 @@ class TestSinglehtmlRender(unittest.TestCase):
         footnote_count = len(soup.select("div[class=footnote]"))
         self.assertEqual(footnote_count, 9)
 
+    def test_sections_in_song_of_solomon(self):
+        usfm_dir = os.path.join(self.resources_dir, 'usfm_projects', 'song_of_solomon')
+        html_dir = os.path.join(self.temp_dir, 'section_person_in_song_of_solomon')
+        os.mkdir(html_dir)
+
+        UsfmTransform.buildSingleHtml(usfm_dir, html_dir, 'bible')
+        html_file = os.path.join(html_dir, 'bible.html')
+        self.assertTrue(os.path.exists(html_file))
+        with codecs.open(html_file, 'r', 'utf-8-sig') as f:
+            converted_html = f.read()
+        soup = BeautifulSoup(converted_html, 'html.parser')
+        chapter_count = len(soup.select("h2[class^=c-num]"))
+        self.assertEqual(chapter_count, 8)
+        verse_count = len(soup.select("span[class^=v-num]"))
+        self.assertEqual(verse_count, 117)
+        # check for \sp
+        section_who_count = len(soup.select("p[class=s-who]"))
+        self.assertEqual(section_who_count, 51)
+
 if __name__ == "__main__":
     unittest.main()
