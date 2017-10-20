@@ -39,58 +39,62 @@ class SingleHTMLRenderer(abstractRenderer.AbstractRenderer):
         self.f = codecs.open(self.outputFilename, 'w', 'utf_8_sig')
         self.run()
         self.writeFootnotes()
-        self.f.write('</body></html>')
+        h = """
+    </body>
+</html>
+"""
+        self.f.write(h)
         self.f.close()
 
     def writeHeader(self):
         h = u"""
-        <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-        <html xmlns="http://www.w3.org/1999/xhtml">
-        <head>
-            <meta http-equiv="content-type" content="text/html; charset=utf-8"></meta>
-            <title>""" + self.bookName + u"""</title>
-            <style media="all" type="text/css">
-            .indent-0 {
-                margin-left:0em;
-                margin-bottom:0em;
-                margin-top:0em;
-            }
-            .indent-1 {
-                margin-left:0em;
-                margin-bottom:0em;
-                margin-top:0em;
-            }
-            .indent-2 {
-                margin-left:1em;
-                margin-bottom:0em;
-                margin-top:0em;
-            }
-            .indent-3 {
-                margin-left:2em;
-                margin-bottom:0em;
-                margin-top:0em;
-            }
-            .c-num {
-                color:gray;
-            }
-            .v-num {
-                color:gray;
-            }
-            .tetragrammaton {
-                font-variant: small-caps;
-            }
-            .footnotes {
-                font-size: 0.8em;
-            }
-            .footnotes-hr {
-                width: 90%;
-            }
-            </style>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8"></meta>
+    <title>""" + self.bookName + u"""</title>
+    <style media="all" type="text/css">
+    .indent-0 {
+        margin-left:0em;
+        margin-bottom:0em;
+        margin-top:0em;
+    }
+    .indent-1 {
+        margin-left:0em;
+        margin-bottom:0em;
+        margin-top:0em;
+    }
+    .indent-2 {
+        margin-left:1em;
+        margin-bottom:0em;
+        margin-top:0em;
+    }
+    .indent-3 {
+        margin-left:2em;
+        margin-bottom:0em;
+        margin-top:0em;
+    }
+    .c-num {
+        color:gray;
+    }
+    .v-num {
+        color:gray;
+    }
+    .tetragrammaton {
+        font-variant: small-caps;
+    }
+    .footnotes {
+        font-size: 0.8em;
+    }
+    .footnotes-hr {
+        width: 90%;
+    }
+    </style>
 
-        </head>
-        <body>
-        <h1>""" + self.bookName + u"""</h1>
-        """
+</head>
+<body>
+<h1>""" + self.bookName + u"""</h1>
+"""
         self.f.write(h.encode('utf-8'))
 
     def startLI(self):
@@ -323,14 +327,14 @@ class SingleHTMLRenderer(abstractRenderer.AbstractRenderer):
         self.fqaFlag = True
 
     def renderFQAE(self, token):
-        self.footnote_text += u'</i>'+token.value
+        if self.fqaFlag:
+            self.footnote_text += u'</i>'+token.value
         self.fqaFlag = False
 
     def closeFootnote(self):
         if self.footnoteFlag:
             self.footnoteFlag = False
-            if self.fqaFlag:
-                self.renderFQAE(UsfmToken(u''))
+            self.renderFQAE(UsfmToken(u''))
             self.footnotes[self.footnote_id] = {
                 'text': self.footnote_text,
                 'book': self.cb,
@@ -346,7 +350,7 @@ class SingleHTMLRenderer(abstractRenderer.AbstractRenderer):
         fkeys = self.footnotes.keys()
         if len(fkeys) > 0:
             self.write(u'<div class="footnotes">')
-            self.write(u'<hr class="footnotes-hr"></hr>')
+            self.write(u'<hr class="footnotes-hr"/>')
             for fkey in sorted(fkeys):
                 footnote = self.footnotes[fkey]
                 self.write(u'<div id="{0}" class="footnote">{1}:{2} <sup><i>[<a href="#ref-{0}">{5}</a>]</i></sup><span class="text">{6}</span></div>'.
