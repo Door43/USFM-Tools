@@ -3,9 +3,10 @@
 
 from __future__ import print_function, unicode_literals
 import sys
+import logging
+
 from pyparsing import Word, OneOrMore, nums, Literal, White, Group, Suppress, NoMatch, Optional, \
     CharsNotIn, MatchFirst
-import logging
 
 __logger = logging.getLogger('usfm_tools')
 

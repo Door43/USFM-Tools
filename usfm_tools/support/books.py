@@ -364,6 +364,9 @@ def bookName(usfm):
 
 # noinspection PyPep8Naming
 def loadBooks(path):
+    """
+    Returns a dictionary of loaded books.
+    """
     loaded_books = {}
     dirList = os.listdir(path)
     __logger.info('LOADING ALL USFM FILES FROM ' + path)
@@ -378,12 +381,14 @@ def loadBooks(path):
 
         # noinspection PyBroadException
         try:
-            f = open(full_file_name, 'U')  # U handles line endings
-            usfm = f.read().decode('utf-8-sig').lstrip()
+            with open(full_file_name, 'rt') as f:
+                fileContents = f.read()
+            try: usfm = fileContents.decode('utf-8-sig').lstrip()
+            except AttributeError: # in Python3
+                usfm = fileContents.lstrip()
             if usfm[:4] == r'\id ' and usfm[4:7] in silNames:
-                # print '     Loaded ' + fname + ' as ' + usfm[4:7]
+                #print('     Loaded ' + fname + ' as ' + usfm[4:7])
                 loaded_books[bookID(usfm)] = usfm
-                f.close()
             else:
                 __logger.info('Ignored ' + fname)
         except:

@@ -3,9 +3,14 @@ import unittest
 import tempfile
 import os
 import codecs
+
 from shutil import rmtree
-from usfm_tools.transform import UsfmTransform
 from bs4 import BeautifulSoup
+
+from sys import path as sysPath
+sysPath.append('.')
+
+from usfm_tools.transform import UsfmTransform
 
 
 class TestSinglehtmlRender(unittest.TestCase):

@@ -1,16 +1,18 @@
 # -*- coding: utf-8 -*-
 #
 
-import abstractRenderer
+from __future__ import print_function, unicode_literals
 import codecs
-import books
+
+import usfm_tools.support.abstractRenderer as abstractRenderer
+import usfm_tools.support.books
 
 #
 #   UTF-8 CVS file
 #
 
 class CSVRenderer(abstractRenderer.AbstractRenderer):
-    
+
     def __init__(self, inputDir, outputFilename):
         # Unset
         self.f = None  # output file stream
@@ -18,28 +20,28 @@ class CSVRenderer(abstractRenderer.AbstractRenderer):
         self.outputFilename = outputFilename
         self.inputDir = inputDir
         # Flags
-        self.cb = u''    # Current Book
-        self.cc = u'001'    # Current Chapter
-        self.cv = u'001'    # Currrent Verse  
+        self.cb = ''    # Current Book
+        self.cc = '001'    # Current Chapter
+        self.cv = '001'    # Currrent Verse
         self.infootnote = False
-        
+
     def render(self):
         self.f = codecs.open(self.outputFilename, 'w', 'utf_8_sig')
         self.loadUSFM(self.inputDir)
         self.run()
         self.f.close()
-        
+
     def writeLog(self, s):
-        print s
-                
+        print(s)
+
     #   SUPPORT
 
     def escape(self, s):
-        return u'' if self.infootnote else s
-            
+        return '' if self.infootnote else s
+
     #   TOKENS
 
-    def renderID(self, token): 
+    def renderID(self, token):
         self.cb = books.bookKeyForIdValue(token.value)
     def renderC(self, token):
         self.cc = token.value.zfill(3)

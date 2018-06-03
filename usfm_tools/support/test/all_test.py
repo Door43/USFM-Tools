@@ -3,11 +3,11 @@ import unittest
 import sys
 sys.path.append("..")
 
-import patch
-import texise
-import htmlise
-import readerise
-import markdownise
+#import patch
+#import texise
+#import htmlise
+#import readerise
+#import markdownise
 
 class TestBooks(unittest.TestCase):
 

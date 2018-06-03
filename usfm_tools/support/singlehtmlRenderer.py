@@ -1,12 +1,13 @@
 # -*- coding: utf-8 -*-
 #
 
-import abstractRenderer
+from __future__ import print_function, unicode_literals
 import codecs
 import datetime
-import books
 
-from parseUsfm import UsfmToken
+from . import abstractRenderer
+from . import books
+from .parseUsfm import UsfmToken
 
 #
 #   Simplest renderer. Ignores everything except ascii text.
@@ -20,19 +21,19 @@ class SingleHTMLRenderer(abstractRenderer.AbstractRenderer):
         self.outputFilename = outputFilename
         self.inputDir = inputDir
         # Position
-        self.cb = u''    # Current Book
-        self.cc = u'001'    # Current Chapter
-        self.cv = u'001'    # Current Verse
+        self.cb = ''    # Current Book
+        self.cc = '001'    # Current Chapter
+        self.cv = '001'    # Current Verse
         self.indentFlag = False
-        self.bookName = u''
-        self.chapterLabel = u'Chapter'
+        self.bookName = ''
+        self.chapterLabel = 'Chapter'
         self.listItemLevel = 0
         self.footnoteFlag = False
         self.fqaFlag = False
         self.footnotes = {}
-        self.footnote_id = u''
+        self.footnote_id = ''
         self.footnote_num = 1
-        self.footnote_text = u''
+        self.footnote_text = ''
 
     def render(self):
         self.loadUSFM(self.inputDir)
@@ -47,12 +48,12 @@ class SingleHTMLRenderer(abstractRenderer.AbstractRenderer):
         self.f.close()
 
     def writeHeader(self):
-        h = u"""
+        h = """
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html lang="en" xmlns="http://www.w3.org/1999/xhtml">
 <head>
     <meta http-equiv="content-type" content="text/html; charset=utf-8"></meta>
-    <title>""" + self.bookName + u"""</title>
+    <title>""" + self.bookName + """</title>
     <style media="all" type="text/css">
     .indent-0 {
         margin-left:0em;
@@ -93,24 +94,26 @@ class SingleHTMLRenderer(abstractRenderer.AbstractRenderer):
 
 </head>
 <body>
-<h1>""" + self.bookName + u"""</h1>
+<h1>""" + self.bookName + """</h1>
 """
-        self.f.write(h.encode('utf-8'))
+        try: self.f.write(h.encode('utf-8'))
+        except TypeError: # in Python3
+            self.f.write(h)
 
     def startLI(self, level=1):
         if self.listItemLevel:
             self.stopLI()
-        ret = u''
+        ret = ''
         self.listItemLevel = 0
         while self.listItemLevel < level:
-            ret += u'<ul>'
-            self.listItemLevel += 1 
+            ret += '<ul>'
+            self.listItemLevel += 1
         return ret
 
     def stopLI(self):
-        ret = u''
+        ret = ''
         while self.listItemLevel > 0:
-            ret += u'</ul>'
+            ret += '</ul>'
             self.listItemLevel -= 1
         return ret
 
@@ -118,29 +121,29 @@ class SingleHTMLRenderer(abstractRenderer.AbstractRenderer):
         return s.replace(u'~',u'&nbsp;')
 
     def write(self, unicodeString):
-        self.f.write(unicodeString.replace(u'~', u' '))
+        self.f.write(unicodeString.replace(u'~', ' '))
 
     def writeIndent(self, level):
         if self.indentFlag:
             self.write(self.stopIndent())  # always close the last indent before starting a new one
         if level > 0:
             self.indentFlag = True
-            self.write(u'\n<p class="indent-' + str(level) + u'">\n')
+            self.write(u'\n<p class="indent-' + str(level) + '">\n')
             self.write(u'&nbsp;' * (level * 4))  # spaces for PDF since we can't style margin with css
 
     def stopIndent(self):
         if self.indentFlag:
             self.indentFlag = False
-            return u'\n</p>\n'
+            return '\n</p>\n'
         else:
-            return u''
+            return ''
 
     def renderID(self, token):
         self.writeFootnotes()
         self.cb = books.bookKeyForIdValue(token.value)
-        self.chapterLabel = u'Chapter'
+        self.chapterLabel = 'Chapter'
         self.write(self.stopIndent())
-        #self.write(u'\n\n<span id="' + self.cb + u'"></span>\n')
+        #self.write(u'\n\n<span id="' + self.cb + '"></span>\n')
 
     def renderH(self, token):
         self.bookName = token.value
@@ -152,19 +155,19 @@ class SingleHTMLRenderer(abstractRenderer.AbstractRenderer):
             self.writeHeader()
 
     def renderMT(self, token):
-        return  #self.write(u'\n\n<h1>' + token.value + u'</h1>') # removed to use TOC2
+        return  #self.write(u'\n\n<h1>' + token.value + '</h1>') # removed to use TOC2
 
     def renderMT2(self, token):
-        self.write(u'\n\n<h2>' + token.value + u'</h2>')
+        self.write(u'\n\n<h2>' + token.value + '</h2>')
 
     def renderMT3(self, token):
-        self.write(u'\n\n<h2>' + token.value + u'</h2>')
+        self.write(u'\n\n<h2>' + token.value + '</h2>')
 
     def renderMS1(self, token):
-        self.write(u'\n\n<h3>' + token.value + u'</h3>')
+        self.write(u'\n\n<h3>' + token.value + '</h3>')
 
     def renderMS2(self, token):
-        self.write(u'\n\n<h4>' + token.value + u'</h4>')
+        self.write(u'\n\n<h4>' + token.value + '</h4>')
 
     def renderP(self, token):
         self.write(self.stopIndent())
@@ -184,17 +187,17 @@ class SingleHTMLRenderer(abstractRenderer.AbstractRenderer):
     def renderS1(self, token):
         self.write(self.stopIndent())
         self.write(self.stopLI())
-        self.write(u'\n\n<h4 style="text-align:center">' + token.getValue() + u'</h4>')
+        self.write(u'\n\n<h4 style="text-align:center">' + token.getValue() + '</h4>')
 
     def renderS2(self, token):
         self.write(self.stopIndent())
         self.write(self.stopLI())
-        self.write(u'\n\n<h5 style="text-align:center">' + token.getValue() + u'</h5>')
+        self.write(u'\n\n<h5 style="text-align:center">' + token.getValue() + '</h5>')
 
     def renderS3(self, token):
         self.write(self.stopIndent())
         self.write(self.stopLI())
-        self.write(u'\n\n<h5">' + token.getValue() + u'</h5>')
+        self.write(u'\n\n<h5">' + token.getValue() + '</h5>')
 
     def renderC(self, token):
         self.write(self.stopIndent())
@@ -220,7 +223,7 @@ class SingleHTMLRenderer(abstractRenderer.AbstractRenderer):
         self.write(u'</span>')
 
     def renderTEXT(self, token):
-        self.write(u" " + self.escape(token.value) + u" ")
+        self.write(u" " + self.escape(token.value) + " ")
 
     def renderQ(self, token):
         self.writeIndent(1)
@@ -264,7 +267,7 @@ class SingleHTMLRenderer(abstractRenderer.AbstractRenderer):
 
     def renderFS(self, token):
         self.closeFootnote()
-        self.footnote_id = u'fn-{0}-{1}-{2}-{3}'.format(self.cb, self.cc, self.cv, self.footnote_num)
+        self.footnote_id = 'fn-{0}-{1}-{2}-{3}'.format(self.cb, self.cc, self.cv, self.footnote_num)
         self.write(u'<span id="ref-{0}"><sup><i>[<a href="#{0}">{1}</a>]</i></sup></span>'.format(self.footnote_id, self.footnote_num))
         self.footnoteFlag = True
         text = token.value
@@ -321,13 +324,13 @@ class SingleHTMLRenderer(abstractRenderer.AbstractRenderer):
         self.write(u'\n<span class="chunk-break"></span>\n')
 
     def render_imt1(self, token):
-        self.write(u'\n\n<h2>' + token.value + u'</h2>')
+        self.write(u'\n\n<h2>' + token.value + '</h2>')
 
     def render_imt2(self, token):
-        self.write(u'\n\n<h3>' + token.value + u'</h3>')
+        self.write(u'\n\n<h3>' + token.value + '</h3>')
 
     def render_imt3(self, token):
-        self.write(u'\n\n<h4>' + token.value + u'</h4>')
+        self.write(u'\n\n<h4>' + token.value + '</h4>')
 
     def renderCL(self, token):
         self.chapterLabel = token.value
@@ -336,12 +339,12 @@ class SingleHTMLRenderer(abstractRenderer.AbstractRenderer):
         self.write(u'<i class="quote right" style="display:block;float:right;">'+token.value+'</i>')
 
     def renderFQA(self, token):
-        self.footnote_text += u'<i>'+token.value
+        self.footnote_text += '<i>'+token.value
         self.fqaFlag = True
 
     def renderFQAE(self, token):
         if self.fqaFlag:
-            self.footnote_text += u'</i>'+token.value
+            self.footnote_text += '</i>'+token.value
         self.fqaFlag = False
 
     def closeFootnote(self):
@@ -356,8 +359,8 @@ class SingleHTMLRenderer(abstractRenderer.AbstractRenderer):
                 'footnote': self.footnote_num
             }
             self.footnote_num += 1
-            self.footnote_text = u''
-            self.footnote_id = u''
+            self.footnote_text = ''
+            self.footnote_id = ''
 
     def writeFootnotes(self):
         fkeys = self.footnotes.keys()
@@ -380,4 +383,3 @@ class SingleHTMLRenderer(abstractRenderer.AbstractRenderer):
 
     def renderQACE(self,token):
         self.write(u'</i>')
-

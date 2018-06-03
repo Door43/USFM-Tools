@@ -1,14 +1,16 @@
 # -*- coding: utf-8 -*-
 #
 
-import books
-import parseUsfm
+from __future__ import print_function, unicode_literals
+
+import usfm_tools.support.books as books
+import usfm_tools.support.parseUsfm as parseUsfm
 
 class AbstractRenderer(object):
 
     booksUsfm = None
 
-    chapterLabel = u'Chapter'
+    chapterLabel = 'Chapter'
 
     def writeLog(self, s):
         pass
@@ -20,18 +22,18 @@ class AbstractRenderer(object):
         self.unknowns = []
         try:
             bookName = self.renderBook
-            if self.booksUsfm.has_key(bookName):
+            if bookName in self.booksUsfm:
                 self.writeLog('     (' + bookName + ')')
                 tokens = parseUsfm.parseString(self.booksUsfm[bookName])
                 for t in tokens: t.renderOn(self)
         except:
             for bookName in books.silNames:
-                if self.booksUsfm.has_key(bookName):
+                if bookName in self.booksUsfm:
                     self.writeLog('     (' + bookName + ')')
                     tokens = parseUsfm.parseString(self.booksUsfm[bookName])
                     for t in tokens: t.renderOn(self)
         if len(self.unknowns):
-            print 'Skipped unknown tokens: {0}'.format(', '.join(set(self.unknowns)))
+            print('Skipped unknown tokens: {0}'.format(', '.join(set(self.unknowns))))
 
     def renderID(self, token):      pass
     def renderIDE(self, token):     pass

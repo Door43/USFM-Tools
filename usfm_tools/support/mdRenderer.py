@@ -1,8 +1,10 @@
 # -*- coding: utf-8 -*-
 #
 
-import abstractRenderer
+from __future__ import print_function, unicode_literals
 import codecs
+
+import usfm_tools.support.abstractRenderer as abstractRenderer
 
 #
 #   Simplest renderer. Ignores everything except ascii text.
@@ -18,7 +20,7 @@ class MarkdownRenderer(abstractRenderer.AbstractRenderer):
         self.inputDir = inputDir
         # Position
         self.currentC = 1
-        self.book = u''
+        self.book = ''
 
     def render(self):
         self.f = codecs.open(self.outputFilename, 'w', 'utf_8_sig')
@@ -27,7 +29,7 @@ class MarkdownRenderer(abstractRenderer.AbstractRenderer):
         self.f.close()
 
     def writeLog(self, s):
-        print s
+        print(s)
 
     # Support
 
@@ -37,16 +39,16 @@ class MarkdownRenderer(abstractRenderer.AbstractRenderer):
     def renderTEXT(self, token):    self.f.write(self.escape(token.value))
 
     def renderH(self, token):       self.book = token.getValue()
-    def renderMT(self, token):      self.f.write(u'\n\n# ' + token.value.upper() + u'\n\n')
-    def renderMT2(self, token):     self.f.write(u'\n\n## ' + token.value.upper() + u'\n\n')
-    def renderMS(self, token):      self.f.write(u'\n\n' + token.value + u'\n' + (u'=' * len(token.value)) + u'\n\n')
-    def renderMS2(self, token):     self.f.write(u'\n\n' + token.value + u'\n' + (u'-' * len(token.value)) + u'\n\n')
+    def renderMT(self, token):      self.f.write(u'\n\n# ' + token.value.upper() + '\n\n')
+    def renderMT2(self, token):     self.f.write(u'\n\n## ' + token.value.upper() + '\n\n')
+    def renderMS(self, token):      self.f.write(u'\n\n' + token.value + '\n' + (u'=' * len(token.value)) + '\n\n')
+    def renderMS2(self, token):     self.f.write(u'\n\n' + token.value + '\n' + (u'-' * len(token.value)) + '\n\n')
     def renderP(self, token):       self.f.write(u'\n\n')
     def renderB(self, token):       self.f.write(u'\n\n')
     def renderS(self, token):       self.f.write(u'\n\ \n')
     def renderS2(self, token):      self.f.write(u'\n\ \n')
-    def renderC(self, token):       self.currentC = token.value; self.f.write(u'\n\n [' + self.book + u' ' + self.currentC + u' ] \n\n')
-    def renderV(self, token):       self.f.write(u' [' + self.currentC + u':' + token.value + u'] ')
+    def renderC(self, token):       self.currentC = token.value; self.f.write(u'\n\n [' + self.book + ' ' + self.currentC + ' ] \n\n')
+    def renderV(self, token):       self.f.write(u' [' + self.currentC + ':' + token.value + '] ')
     def renderQ(self, token):       self.f.write(u'\n|  ')
     def renderQ1(self, token):      self.f.write(u'\n|  ')
     def renderQ2(self, token):      self.f.write(u'\n|    ')
@@ -55,8 +57,8 @@ class MarkdownRenderer(abstractRenderer.AbstractRenderer):
     def renderLI(self, token):      self.f.write(u'* ')
     def renderPBR(self, token):     self.f.write(u'\n')
 
-    def renderBDS(self, token):     self.f.write( u'**')
-    def renderBDE(self, token):     self.f.write( u'**')
+    def renderBDS(self, token):     self.f.write( '**')
+    def renderBDE(self, token):     self.f.write( '**')
     def renderBDITS(self, token):   pass
     def renderBDITE(self, token):   pass
 
@@ -72,7 +74,6 @@ class MarkdownRenderer(abstractRenderer.AbstractRenderer):
     def renderXO(self, token):      self.f.write(self.escape(token.value))
     def renderXT(self, token):      self.f.write(self.escape(token.value))
 
-    def render_imt1(self, token):   self.f.write(u'\n\n## ' + token.value.upper() + u'\n\n')
-    def render_imt2(self, token):   self.f.write(u'\n\n### ' + token.value.upper() + u'\n\n')
-    def render_imt3(self, token):   self.f.write(u'\n\n#### ' + token.value.upper() + u'\n\n')
-
+    def render_imt1(self, token):   self.f.write(u'\n\n## ' + token.value.upper() + '\n\n')
+    def render_imt2(self, token):   self.f.write(u'\n\n### ' + token.value.upper() + '\n\n')
+    def render_imt3(self, token):   self.f.write(u'\n\n#### ' + token.value.upper() + '\n\n')

@@ -4,7 +4,8 @@ import sys
 import os
 import logging
 from subprocess import Popen, PIPE
-from usfm_tools.support import loutRenderer, contextRenderer, htmlRenderer, singlehtmlRenderer, csvRenderer, \
+
+from .support import loutRenderer, contextRenderer, htmlRenderer, singlehtmlRenderer, csvRenderer, \
     readerise, mdRenderer, asciiRenderer, usxRenderer, mediawikiPrinter
 
 
@@ -227,7 +228,7 @@ class UsfmTransform(object):
             UsfmTransform.buildCSV(usfm_dir, build_dir, build_name)
         elif targets == 'usx':
             if by_book_flag:
-                build_name = u''
+                build_name = ''
             UsfmTransform.buildUSX(usfm_dir, build_dir, build_name, by_book_flag)
         else:
             UsfmTransform.usage()

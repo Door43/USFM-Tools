@@ -16,7 +16,7 @@ class DummyFile(object):
         pass
 
 class HTMLRenderer(abstractRenderer.AbstractRenderer):
-    
+
     def __init__(self, inputDir, outputDir):
         # Unset
         self.f = DummyFile()  # output file stream
@@ -24,14 +24,14 @@ class HTMLRenderer(abstractRenderer.AbstractRenderer):
         self.outputDir = outputDir
         self.inputDir = inputDir
         # Position
-        self.cb = u''    # Current Book
-        self.cc = u'001'    # Current Chapter
-        self.cv = u'001'    # Currrent Verse
+        self.cb = ''    # Current Book
+        self.cc = '001'    # Current Chapter
+        self.cv = '001'    # Currrent Verse
         self.indentFlag = False
-        
+
     def render(self):
         # Write index
-        self.f = open(self.outputDir + u'/index.html', 'w')
+        self.f = open(self.outputDir + '/index.html', 'w')
         self.write(indexPage)
         self.close()
         self.f = DummyFile()
@@ -39,18 +39,18 @@ class HTMLRenderer(abstractRenderer.AbstractRenderer):
         self.loadUSFM(self.inputDir)
         self.run()
         self.f.close()
-        
+
     def writeLog(self, s):
         print s
-        
-    # Support    
-        
+
+    # Support
+
     def openFile(self, bookID):
-        self.f = open(self.outputDir + u'/b' + bookID + u'.html', 'w')
-        
-    def close(self): 
+        self.f = open(self.outputDir + '/b' + bookID + '.html', 'w')
+
+    def close(self):
         self.f.close()
- 
+
     def write(self, unicodeString):
         self.f.write(unicodeString.encode('utf-8'))
 
@@ -58,24 +58,24 @@ class HTMLRenderer(abstractRenderer.AbstractRenderer):
         if level == 0:
             self.indentFlag = False
             self.write(u'<br /><br />')
-            return 
+            return
         if not self.indentFlag:
             self.indentFlag = True
             self.write(u'<br />')
         self.write(u'<br />')
         self.write(u'&nbsp;&nbsp;&nbsp;&nbsp;' * level)
 
-    def renderID(self, token): 
+    def renderID(self, token):
         self.write(footer)
         self.close()
         self.cb = books.bookKeyForIdValue(token.value)
         self.openFile(self.cb)
         self.write(header)
         self.indentFlag = False
-    def renderMT(self, token):      self.write(u'</p><h1>' + token.value + u'</h1><p>')
-    def renderMT2(self, token):      self.write(u'</p><h2>' + token.value + u'</h2><p>')
-    def renderMS(self, token):      self.write(u'</p><h4>' + token.value + u'</h4><p><br />')
-    def renderMS2(self, token):     self.write(u'</p><h5>' + token.value + u'</h5><p><br />')
+    def renderMT(self, token):      self.write(u'</p><h1>' + token.value + '</h1><p>')
+    def renderMT2(self, token):      self.write(u'</p><h2>' + token.value + '</h2><p>')
+    def renderMS(self, token):      self.write(u'</p><h4>' + token.value + '</h4><p><br />')
+    def renderMS2(self, token):     self.write(u'</p><h5>' + token.value + '</h5><p><br />')
     def renderP(self, token):
         self.indentFlag = False
         self.write(u'<br /><br />')
@@ -87,16 +87,16 @@ class HTMLRenderer(abstractRenderer.AbstractRenderer):
         self.write(u'</p><p align="center">----</p><p>')
     def renderC(self, token):
         self.cc = token.value.zfill(3)
-        self.write(u'<h2 class="c-num">' + token.value + u'</h2><p>')
+        self.write(u'<h2 class="c-num">' + token.value + '</h2><p>')
     def renderV(self, token):
         self.cv = token.value.zfill(3)
-        if self.cv == u'001':
-            self.write(u'\n<span class="verse" rel="v' + self.cb + self.cc + self.cv + u'"><span class="v-num-1">' + token.value + u'&nbsp;</span>\n')
+        if self.cv == '001':
+            self.write(u'\n<span class="verse" rel="v' + self.cb + self.cc + self.cv + '"><span class="v-num-1">' + token.value + '&nbsp;</span>\n')
         else:
-            self.write(u'</span>\n<span class="verse" rel="v' + self.cb + self.cc + self.cv + u'"><span class="v-num">' + token.value + u'&nbsp;</span>\n')
+            self.write(u'</span>\n<span class="verse" rel="v' + self.cb + self.cc + self.cv + '"><span class="v-num">' + token.value + '&nbsp;</span>\n')
     def renderWJS(self, token):     self.write(u'<span class="woc">')
     def renderWJE(self, token):     self.write(u'</span>')
-    def renderTEXT(self, token):    self.write(u" " + token.value + u" ")
+    def renderTEXT(self, token):    self.write(u" " + token.value + " ")
     def renderQ(self, token):       self.writeIndent(1)
     def renderQ1(self, token):      self.writeIndent(1)
     def renderQ2(self, token):      self.writeIndent(2)
@@ -175,7 +175,7 @@ indexPage = ur"""
         <li><a href="b037.html">Haggai</a></li>
         <li><a href="b038.html">Zechariah</li>
         <li><a href="b039.html">Malachi</li>
-        </ul>            
+        </ul>
 
         <p><b>New Testament</b></p>
         <ul>
@@ -278,7 +278,7 @@ header = ur"""
         <li><a href="b037.html">Haggai</a></li>
         <li><a href="b038.html">Zechariah</li>
         <li><a href="b039.html">Malachi</li>
-        </ul>            
+        </ul>
 
         <p><b>New Testament</b></p>
         <ul>
@@ -315,5 +315,5 @@ header = ur"""
         """
 
 footer = ur"""
-        </p></div></body>   
+        </p></div></body>
         """

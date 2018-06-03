@@ -1,9 +1,11 @@
 # -*- coding: utf-8 -*-
 #
 
-import abstractRenderer
+from __future__ import print_function, unicode_literals
 import codecs
-import books
+
+from . import abstractRenderer
+from . import books
 
 #
 #   Renders as set of web pages
@@ -25,12 +27,12 @@ class HTMLRenderer(abstractRenderer.AbstractRenderer):
         self.outputDir = outputDir
         self.inputDir = inputDir
         # Caches
-        self.cachedChapterMarker = u''
-        self.cachedBookname = u''
+        self.cachedChapterMarker = ''
+        self.cachedBookname = ''
         # Position
-        self.cb = u''    # Current Book
-        self.cc = u'001'    # Current Chapter
-        self.cv = u'001'    # Currrent Verse
+        self.cb = ''    # Current Book
+        self.cc = '001'    # Current Chapter
+        self.cv = '001'    # Currrent Verse
         # Flags
         self.indentFlag = False
         self.oebFlag = oebFlag
@@ -45,17 +47,17 @@ class HTMLRenderer(abstractRenderer.AbstractRenderer):
         self.close()
 
     def writeLog(self, s):
-        print s
+        print(s)
 
     # File handling
 
     def openFile(self, bookID):
-        self.f = open(self.outputDir + u'/b' + bookID + u'_' + str(self.fileCounter) + u'.html', 'w')
+        self.f = open(self.outputDir + '/b' + bookID + '_' + str(self.fileCounter) + '.html', 'w')
         self.bookID = bookID
         self.ft = []
 
     def close(self):
-        t = u''.join(self.ft)
+        t = ''.join(self.ft)
         self.f.write(self.cleanHTML(t).encode('utf-8'))
         self.f.close()
 
@@ -64,41 +66,41 @@ class HTMLRenderer(abstractRenderer.AbstractRenderer):
 
     def cleanHTML(self, t):
         c = t
-        c = t.replace(u'<p><br /><br />', u'<p>')
-        c = c.replace(ur'~', u'&nbsp;')
+        c = t.replace('<p><br /><br />', '<p>')
+        c = c.replace(r'~', '&nbsp;')
         if self.oebFlag:
-            c = c.replace(ur'%navmarker%', u'OEB')
-            c = c.replace(ur'%linkToWebsite%',u'<tr><td colspan = "2"><a href="http://openenglishbible.org">OpenEnglishBible.org</a></td></tr>')
+            c = c.replace(r'%navmarker%', 'OEB')
+            c = c.replace(r'%linkToWebsite%','<tr><td colspan = "2"><a href="http://openenglishbible.org">OpenEnglishBible.org</a></td></tr>')
         else:
-            c = c.replace(ur'%navmarker%', u'<div style="font-size:200%;color:green;">✝</div>')
-            c = c.replace(ur'%linkToWebsite%',u'')
+            c = c.replace(r'%navmarker%', '<div style="font-size:200%;color:green;">✝</div>')
+            c = c.replace(r'%linkToWebsite%','')
         return c
 
     # Support
     def incrementFile(self):
         self.ft.append(footer)
-        self.ft.append(u'</html>')
+        self.ft.append('</html>')
         self.close()
         self.ft = []
         self.ft.append(header)
         self.ft.append("<p>")
         self.fileCounter +=1
-        self.f = open(self.outputDir + u'/b' + self.bookID + u'_' + str(self.fileCounter) + u'.html', 'w')
+        self.f = open(self.outputDir + '/b' + self.bookID + '_' + str(self.fileCounter) + '.html', 'w')
 
     def writeChapterMarker(self):
         self.write(self.cachedChapterMarker)
-        self.cachedChapterMarker = u''
+        self.cachedChapterMarker = ''
 
     def writeIndent(self, level):
         if level == 0:
             self.indentFlag = False
-            self.write(u'<br /><br />')
+            self.write('<br /><br />')
             return
         if not self.indentFlag:
             self.indentFlag = True
-            self.write(u'<br />')
-        self.write(u'<br />')
-        self.write(u'&nbsp;&nbsp;' * level)
+            self.write('<br />')
+        self.write('<br />')
+        self.write('&nbsp;&nbsp;' * level)
         self.writeChapterMarker()
 
     def renderID(self, token):
@@ -108,24 +110,24 @@ class HTMLRenderer(abstractRenderer.AbstractRenderer):
         self.openFile(self.cb)
         self.write(header)
         self.indentFlag = False
-    def renderTOC2(self, token):      self.write(u'</p><h2>' + token.value + u'</h2><p>')
-    def renderMT(self, token):      self.write(u'</p><h1>' + token.value + u'</h1><p>')
-    def renderMT2(self, token):      self.write(u'</p><h2>' + token.value + u'</h2><p>')
-    def renderMS(self, token):      self.write(u'</p><h4>' + token.value + u'</h4><p>')
-    def renderMS2(self, token):     self.write(u'</p><h5>' + token.value + u'</h5><p>')
+    def renderTOC2(self, token):      self.write('</p><h2>' + token.value + '</h2><p>')
+    def renderMT(self, token):      self.write('</p><h1>' + token.value + '</h1><p>')
+    def renderMT2(self, token):      self.write('</p><h2>' + token.value + '</h2><p>')
+    def renderMS(self, token):      self.write('</p><h4>' + token.value + '</h4><p>')
+    def renderMS2(self, token):     self.write('</p><h5>' + token.value + '</h5><p>')
     def renderP(self, token):
         self.indentFlag = False
-        self.write(u'<br /><br />')
+        self.write('<br /><br />')
         self.writeChapterMarker()
     def renderS(self, token):
         self.indentFlag = False
-        if token.value == u'~':
-            self.write(u'<p>&nbsp;</p><p>')
+        if token.value == '~':
+            self.write('<p>&nbsp;</p><p>')
         else:
-            self.write(u'</p><h6>' + token.value + u'</h6><p>')
+            self.write('</p><h6>' + token.value + '</h6><p>')
     def renderS2(self, token):
         self.indentFlag = False
-        self.write(u'</p><h7>' + token.value + u'</h7><p>')
+        self.write('</p><h7>' + token.value + '</h7><p>')
     def renderS5(self,token):
         if (self.secondaryCounter>=5):
             self.secondaryCounter = 1
@@ -134,111 +136,111 @@ class HTMLRenderer(abstractRenderer.AbstractRenderer):
             self.secondaryCounter+=1
     def renderC(self, token):
         self.cc = token.value.zfill(3)
-        self.cachedChapterMarker = u'<span class="chapter">' + token.value + u'</span>'
-        # if self.cb==u'019': self.write(u'<p><em>Psalm ' + token.value + u'</em></p>')
+        self.cachedChapterMarker = '<span class="chapter">' + token.value + '</span>'
+        # if self.cb=='019': self.write('<p><em>Psalm ' + token.value + '</em></p>')
     def renderV(self, token):
         self.cv = token.value.zfill(3)
-        if self.cv == u'001':
+        if self.cv == '001':
             pass
         else:
-            self.write(u'\n<span class="verse" rel="v' + self.cb + self.cc + self.cv + u'">' + token.value + u'</span>\n')
-    def renderWJS(self, token):     self.write(u'<span class="woc">')
-    def renderWJE(self, token):     self.write(u'</span>')
+            self.write('\n<span class="verse" rel="v' + self.cb + self.cc + self.cv + '">' + token.value + '</span>\n')
+    def renderWJS(self, token):     self.write('<span class="woc">')
+    def renderWJE(self, token):     self.write('</span>')
 
-    def renderNDS(self, token):     self.write(u'<span class="nd">')
-    def renderNDE(self, token):     self.write(u'</span>')
+    def renderNDS(self, token):     self.write('<span class="nd">')
+    def renderNDE(self, token):     self.write('</span>')
 
-    def renderTEXT(self, token):    self.write(u" " + token.value + u" ")
+    def renderTEXT(self, token):    self.write(' ' + token.value + ' ')
     def renderQ(self, token):       self.writeIndent(1)
     def renderQ1(self, token):      self.writeIndent(1)
     def renderQ2(self, token):      self.writeIndent(2)
     def renderQ3(self, token):      self.writeIndent(3)
     def renderNB(self, token):      self.writeIndent(0)
-    def renderB(self, token):       self.write(u'<br />')
-    def renderIS(self, token):      self.write(u'<i>')
-    def renderIE(self, token):      self.write(u'</i>')
-    def renderBDS(self, token):     self.f.write(u'<b>')
-    def renderBDE(self, token):     self.f.write(u'</b>')
-    def renderBDITS(self, token):   self.f.write(u'<b><i>')
-    def renderBDITE(self, token):   self.f.write(u'</b></i>')
-    def renderPBR(self, token):     self.write(u'<br />')
+    def renderB(self, token):       self.write('<br />')
+    def renderIS(self, token):      self.write('<i>')
+    def renderIE(self, token):      self.write('</i>')
+    def renderBDS(self, token):     self.f.write('<b>')
+    def renderBDE(self, token):     self.f.write('</b>')
+    def renderBDITS(self, token):   self.f.write('<b><i>')
+    def renderBDITE(self, token):   self.f.write('</b></i>')
+    def renderPBR(self, token):     self.write('<br />')
 
     #handle tables
     def renderTR(self,token):
-        self.write(u'<tr>' + token.value + '</tr>')
+        self.write('<tr>' + token.value + '</tr>')
     def renderTHR1(self,token):
-        self.write(u'<th class="align-right">' + token.value + '</th>')
+        self.write('<th class="align-right">' + token.value + '</th>')
     def renderTHR2(self,token):
-        self.write(u'<th class="align-right">' + token.value + '</th>')
+        self.write('<th class="align-right">' + token.value + '</th>')
     def renderTHR3(self,token):
-        self.write(u'<th class="align-right">' + token.value + '</th>')
+        self.write('<th class="align-right">' + token.value + '</th>')
     def renderTHR4(self,token):
-        self.write(u'<th class="align-right">' + token.value + '</th>')
+        self.write('<th class="align-right">' + token.value + '</th>')
     def renderTHR5(self,token):
-        self.write(u'<th class="align-right">' + token.value + '</th>')
+        self.write('<th class="align-right">' + token.value + '</th>')
     def renderTHR6(self,token):
-        self.write(u'<th class="align-right">' + token.value + '</th>')
+        self.write('<th class="align-right">' + token.value + '</th>')
 
     def renderTH1(self,token):
-        self.write(u'<th>' + token.value + '</th>')
+        self.write('<th>' + token.value + '</th>')
     def renderTH2(self,token):
-        self.write(u'<th>' + token.value + '</th>')
+        self.write('<th>' + token.value + '</th>')
     def renderTH3(self,token):
-        self.write(u'<th>' + token.value + '</th>')
+        self.write('<th>' + token.value + '</th>')
     def renderTH4(self,token):
-        self.write(u'<th>' + token.value + '</th>')
+        self.write('<th>' + token.value + '</th>')
     def renderTH5(self,token):
-        self.write(u'<th>' + token.value + '</th>')
+        self.write('<th>' + token.value + '</th>')
     def renderTH6(self,token):
-        self.write(u'<th>' + token.value + '</th>')
+        self.write('<th>' + token.value + '</th>')
     #table column right aligned
     def renderTCR1(self,token):
-        self.write(u'<td class="align-right">' + token.value + '</td>')
+        self.write('<td class="align-right">' + token.value + '</td>')
     def renderTCR2(self,token):
-        self.write(u'<td class="align-right">' + token.value + '</td>')
+        self.write('<td class="align-right">' + token.value + '</td>')
     def renderTCR3(self,token):
-        self.write(u'<td class="align-right">' + token.value + '</td>')
+        self.write('<td class="align-right">' + token.value + '</td>')
     def renderTCR4(self,token):
-        self.write(u'<td class="align-right">' + token.value + '</td>')
+        self.write('<td class="align-right">' + token.value + '</td>')
     def renderTCR5(self,token):
-        self.write(u'<td class="align-right">' + token.value + '</td>')
+        self.write('<td class="align-right">' + token.value + '</td>')
     def renderTCR6(self,token):
-        self.write(u'<td class="align-right">' + token.value + '</td>')
+        self.write('<td class="align-right">' + token.value + '</td>')
 
     #table column
     def renderTC1(self,token):
-        self.write(u'<td>' + token.value + '</td>')
+        self.write('<td>' + token.value + '</td>')
     def renderTC2(self,token):
-        self.write(u'<td>' + token.value + '</td>')
+        self.write('<td>' + token.value + '</td>')
     def renderTC3(self,token):
-        self.write(u'<td>' + token.value + '</td>')
+        self.write('<td>' + token.value + '</td>')
     def renderTC4(self,token):
-        self.write(u'<td>' + token.value + '</td>')
+        self.write('<td>' + token.value + '</td>')
     def renderTC5(self,token):
-        self.write(u'<td>' + token.value + '</td>')
+        self.write('<td>' + token.value + '</td>')
     def renderTC6(self,token):
-        self.write(u'<td>' + token.value + '</td>')
+        self.write('<td>' + token.value + '</td>')
 
     def renderD(self, token):       self.writeChapterMarker()
 
     def render_is1(self, token):    self.renderS(token)
-    def render_imt1(self, token):   self.write(u'</p><h2>' + token.value + u'</h2><p>')
-    def render_imt2(self, token):   self.write(u'</p><h3>' + token.value + u'</h3><p>')
-    def render_imt3(self, token):   self.write(u'</p><h4>' + token.value + u'</h4><p>')
+    def render_imt1(self, token):   self.write('</p><h2>' + token.value + '</h2><p>')
+    def render_imt2(self, token):   self.write('</p><h3>' + token.value + '</h3><p>')
+    def render_imt3(self, token):   self.write('</p><h4>' + token.value + '</h4><p>')
     def render_ip(self, token):     self.renderP(token)
     def render_iot(self, token):    self.renderQ(token)
     def render_io1(self, token):    self.renderQ2(token)
 
-    def renderFS(self, token):      self.write(u'<span class="rightnotemarker">*</span><span class="rightnote">')
-    def renderFE(self, token):      self.write(u'</span>')
-    def renderFP(self, token):      self.write(u'<br />')
+    def renderFS(self, token):      self.write('<span class="rightnotemarker">*</span><span class="rightnote">')
+    def renderFE(self, token):      self.write('</span>')
+    def renderFP(self, token):      self.write('<br />')
 
 
 #
 #  Structure
 #
 
-header = ur"""<!DOCTYPE html>
+header = r"""<!DOCTYPE html>
     <html lang="en">
     <head>
     <title>Open English Bible</title>
@@ -393,8 +395,8 @@ header = ur"""<!DOCTYPE html>
     <body>
         """
 
-footer = ur"""
+footer = r"""
         </p></body>
         """
 
-indexPage = header + ur"""<h1>Bible</h1>""" + footer
+indexPage = header + '<h1>Bible</h1>' + footer

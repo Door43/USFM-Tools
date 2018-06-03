@@ -1,9 +1,11 @@
 # -*- coding: utf-8 -*-
 #
 
-import abstractRenderer
+from __future__ import print_function, unicode_literals
 import codecs
 import datetime
+
+import usfm_tools.support.abstractRenderer as abstractRenderer
 
 #
 #   Renders to ConTeXt so we can make PDF. Main renderer for PDF of OEB
@@ -18,19 +20,19 @@ class ConTeXtRenderer(abstractRenderer.AbstractRenderer):
         self.outputFilename = outputFilename
         self.inputDir = inputDir
         # Flags
-        self.printerState = {u'li': False, u'd': False}
+        self.printerState = {'li': False, 'd': False}
         self.smallCapSections = True  # Sometimes we don't want to do this, like for Psalms
         self.justDidLORD = False
         self.justDidNB = False
         self.doNB = False
         self.narrower = False
-        self.doChapterOrVerse = u''
+        self.doChapterOrVerse = ''
         self.smallcaps = False
 
     def render(self):
         self.f = codecs.open(self.outputFilename, 'w', 'utf_8_sig')
         self.loadUSFM(self.inputDir)
-        self.f.write(u"""
+        self.f.write(r"""
             Document rendered on """ + datetime.date.today().strftime("%F") + r"""
             \par
             \page[right]
@@ -44,7 +46,7 @@ class ConTeXtRenderer(abstractRenderer.AbstractRenderer):
         self.f.close()
 
     def writeLog(self, s):
-        print s.encode('ascii', 'ignore')
+        print(s.encode('ascii', 'ignore'))
 
 
     #
@@ -52,22 +54,22 @@ class ConTeXtRenderer(abstractRenderer.AbstractRenderer):
     #
 
     def startNarrower(self, n):
-        s = u'}' if self.narrower else u'\n\\blank[medium] '
+        s = '}' if self.narrower else '\n\\blank[medium] '
         self.narrower = True
-        s = s + u'\n\\noindentation \\Q{' + str(n) + u'}{'
+        s = s + '\n\\noindentation \\Q{' + str(n) + '}{'
         self.doNB = True
         return s
 
     def stopNarrower(self):
-        s = u'}\n\\blank[medium] ' if self.narrower else u''
+        s = '}\n\\blank[medium] ' if self.narrower else ''
         self.narrower = False
         return s
 
     def escapeText(self, s):
-        return ( s.replace(u'&', u'\\&').replace(u'%', u'\\%')
-                  .replace(u'#', u'\\#').replace(u'$', u'\\$')
-                  .replace(u'_', u'\\_').replace(u'{', u'\\{')
-                  .replace(u'}', u'\\}') )
+        return ( s.replace('&', '\\&').replace('%', '\\%')
+                  .replace('#', '\\#').replace('$', '\\$')
+                  .replace('_', '\\_').replace('{', '\\{')
+                  .replace('}', '\\}') )
 
     def markForSmallCaps(self):
         if self.smallCapSections:
@@ -83,56 +85,56 @@ class ConTeXtRenderer(abstractRenderer.AbstractRenderer):
          i = 0
          while i < len(s):
              if i < 50:  #we are early, look for comma
-                 if s[i] == u',' or s[i] == u';' or s[i] == u'(' or s[i:i+3] == u'and':
-                     return u'{\sc ' + s[:i+1] + u'}' + s[i+1:]
+                 if s[i] == ',' or s[i] == ';' or s[i] == '(' or s[i:i+3] == 'and':
+                     return '{\sc ' + s[:i+1] + '}' + s[i+1:]
              else: # look for space
                  if s[i] == ' ':
-                     return u'{\sc ' + s[:i] + u'}' + s[i:]
+                     return '{\sc ' + s[:i] + '}' + s[i:]
              i = i + 1
-         return u'{\sc ' + s + u'}'
+         return '{\sc ' + s + '}'
 
     def startLI(self):
-        if self.printerState[u'li'] == False:
-            self.printerState[u'li'] = True
-            #return u'\startitemize \item '
-            return ur'\startexdent '
+        if self.printerState['li'] == False:
+            self.printerState['li'] = True
+            #return '\startitemize \item '
+            return r'\startexdent '
         else:
-            #return u'\item '
-            return ur'\par '
+            #return '\item '
+            return r'\par '
 
     def stopLI(self):
-        if self.printerState[u'li'] == False:
-            return u''
-        #elif self.printerState[u'li2'] == False:
-            #return u''
-        #elif self.printerState[u'li3'] == False:
-            #return u''
+        if self.printerState['li'] == False:
+            return ''
+        #elif self.printerState['li2'] == False:
+            #return ''
+        #elif self.printerState['li3'] == False:
+            #return ''
         else:
-            self.printerState[u'li'] = False
-            #return u'\stopitemize'
-            return ur'\stopexdent '
+            self.printerState['li'] = False
+            #return '\stopitemize'
+            return r'\stopexdent '
 
     def startD(self):
-        if self.printerState[u'd'] == False:
-            self.printerState[u'd'] = True
-        return u'\par {\startalignment[center] \em '
+        if self.printerState['d'] == False:
+            self.printerState['d'] = True
+        return r'\par {\startalignment[center] \em '
 
     def stopD(self):
-        if self.printerState[u'd'] == False:
-            return u''
+        if self.printerState['d'] == False:
+            return ''
         else:
-            self.printerState[u'd'] = False
-            return u'\stopalignment }'
+            self.printerState['d'] = False
+            return r'\stopalignment }'
 
     def newLine(self):
-        s = u'\n\par \n'
+        s = '\n\\par \n'
         if self.doNB:
             self.doNB = False
             self.justDidNB = True
-            s = s + ur'\noindentation '
+            s = s + r'\noindentation '
         elif self.justDidNB:
             self.justDidNB = False
-            s = s + ur'\indentation '
+            s = s + r'\indentation '
         return s
 
 
@@ -140,93 +142,93 @@ class ConTeXtRenderer(abstractRenderer.AbstractRenderer):
     #   Tokens
     #
 
-    def renderID(self, token):      self.f.write( self.stopNarrower() + ur"\marking[RAChapter]{ } \marking[RABook]{ } \marking[RASection]{ }" )
-    def renderH(self, token):       self.f.write( u'\n\n\RAHeader{' + self.escapeText(token.value) + u'}\n')
-    def renderTOC1(self, token):      self.f.write( self.stopLI() + self.stopNarrower() + u'\n\TOC1{' + token.value + u'}\n')
-    def renderTOC2(self, token):      self.f.write( self.stopLI() + self.stopNarrower() + u'\n\TOC2{' + token.value + u'}\n')
-    def renderTOC3(self, token):      self.f.write( self.stopLI() + self.stopNarrower() + u'\n\TOC3{' + token.value + u'}\n')
-    def renderMT(self, token):      self.f.write( self.stopLI() + self.stopNarrower() + u'\n\MT{' + token.value + u'}\n')
-    def renderMT2(self, token):     self.f.write( self.stopLI() + self.stopNarrower() + u'\n\MTT{' + token.value + u'}\n')
-    def renderMS(self, token):      self.markForSmallCaps() ; self.f.write(self.stopNarrower() + u'\n\MS{' + self.escapeText(token.value) + u'}\n') ; self.doNB = True
-    def renderMS2(self, token):     self.doNB = True; self.markForSmallCaps() ; self.f.write( self.stopNarrower() + u'\n\MSS{' + self.escapeText(token.value) + '}' + self.newLine() )
+    def renderID(self, token):      self.f.write( self.stopNarrower() + r"\marking[RAChapter]{ } \marking[RABook]{ } \marking[RASection]{ }" )
+    def renderH(self, token):       self.f.write( '\n\n\\RAHeader{' + self.escapeText(token.value) + '}\n')
+    def renderTOC1(self, token):      self.f.write( self.stopLI() + self.stopNarrower() + '\n\\TOC1{' + token.value + '}\n')
+    def renderTOC2(self, token):      self.f.write( self.stopLI() + self.stopNarrower() + '\n\\TOC2{' + token.value + '}\n')
+    def renderTOC3(self, token):      self.f.write( self.stopLI() + self.stopNarrower() + '\n\\TOC3{' + token.value + '}\n')
+    def renderMT(self, token):      self.f.write( self.stopLI() + self.stopNarrower() + '\n\\MT{' + token.value + '}\n')
+    def renderMT2(self, token):     self.f.write( self.stopLI() + self.stopNarrower() + '\n\\MTT{' + token.value + '}\n')
+    def renderMS(self, token):      self.markForSmallCaps() ; self.f.write(self.stopNarrower() + '\n\\MS{' + self.escapeText(token.value) + '}\n') ; self.doNB = True
+    def renderMS2(self, token):     self.doNB = True; self.markForSmallCaps() ; self.f.write( self.stopNarrower() + '\n\\MSS{' + self.escapeText(token.value) + '}' + self.newLine() )
     def renderP(self, token):       self.f.write( self.stopD() + self.stopLI() + self.stopNarrower() + self.newLine() )
-    def renderB(self, token):       self.f.write( self.stopD() + self.stopLI() + self.stopNarrower() + u'\\blank \n' )
-    def renderS(self, token):       self.f.write( self.stopD() + self.stopLI() + self.stopNarrower() +  u'\n\\blank[big] ' + u'\n\MSS{' + self.escapeText(token.value) + '}' + self.newLine() ) ; self.doNB = True
-    def renderS2(self, token):      self.doNB = True; self.f.write( self.stopD() + self.stopLI() + self.stopNarrower() + u'\n\\blank[big] ' + u'\n\MSS{' + self.escapeText(token.value) + '}' + self.newLine() )
-    def renderS5(self, token):      self.doNB = True; self.f.write( self.stopD() + self.stopLI() + self.stopNarrower() + u'\n\\blank[big] ' + u'\n\MSS{' + self.escapeText(token.value) + '}' + self.newLine() )
+    def renderB(self, token):       self.f.write( self.stopD() + self.stopLI() + self.stopNarrower() + '\\blank \n' )
+    def renderS(self, token):       self.f.write( self.stopD() + self.stopLI() + self.stopNarrower() +  '\n\\blank[big] ' + '\n\\MSS{' + self.escapeText(token.value) + '}' + self.newLine() ) ; self.doNB = True
+    def renderS2(self, token):      self.doNB = True; self.f.write( self.stopD() + self.stopLI() + self.stopNarrower() + '\n\\blank[big] ' + '\n\\MSS{' + self.escapeText(token.value) + '}' + self.newLine() )
+    def renderS5(self, token):      self.doNB = True; self.f.write( self.stopD() + self.stopLI() + self.stopNarrower() + '\n\\blank[big] ' + '\n\\MSS{' + self.escapeText(token.value) + '}' + self.newLine() )
     def renderC(self, token):
-        self.doChapterOrVerse = u'\C{' + self.escapeText(token.value) + u'}'
-        self.f.write( u' ' )
-    def renderV(self, token):
-        if not token.value == u'1':
-            self.doChapterOrVerse =  u'\V{' + self.escapeText(token.value) + u'}'
+        self.doChapterOrVerse = r'\C{' + self.escapeText(token.value) + '}'
         self.f.write( ' ' )
-    def renderWJS(self, token):     self.f.write( u" " )
-    def renderWJE(self, token):     self.f.write( u" " )
+    def renderV(self, token):
+        if not token.value == '1':
+            self.doChapterOrVerse =  r'\V{' + self.escapeText(token.value) + '}'
+        self.f.write( ' ' )
+    def renderWJS(self, token):     self.f.write( " " )
+    def renderWJE(self, token):     self.f.write( " " )
     def renderTEXT(self, token):
         s = self.escapeText(token.value)
-        if self.smallcaps and not self.doChapterOrVerse == u'':
+        if self.smallcaps and not self.doChapterOrVerse == '':
             s = self.renderSmallCaps(s)
             s = self.doChapterOrVerse + s
-            self.doChapterOrVerse = u''
-        elif not self.doChapterOrVerse == u'':
-            i = s.find(u' ')
+            self.doChapterOrVerse = ''
+        elif not self.doChapterOrVerse == '':
+            i = s.find(' ')
             if i == -1:
                 # No space found - try end
                 i = len(s)
             s = s[:i] + self.doChapterOrVerse + s[i+1:]
-            self.doChapterOrVerse = u''
+            self.doChapterOrVerse = ''
         elif self.smallcaps:
             s = self.renderSmallCaps(s)
         if self.justDidLORD:
             if s[0].isalpha():
-                s = u' ' + s
+                s = ' ' + s
             self.justDidLORD = False
         self.f.write(s)
-        self.f.write(u' ')
+        self.f.write(' ')
     def renderQ(self, token):       self.renderQ1(token)
     def renderQ1(self, token):      self.f.write( self.stopD() + self.stopLI() + self.startNarrower(1) )
     def renderQ2(self, token):      self.f.write( self.stopD() + self.stopLI() + self.startNarrower(2) )
     def renderQ3(self, token):      self.f.write( self.stopD() + self.stopLI() + self.startNarrower(3) )
-    def renderNB(self, token):      self.doNB = True ; self.f.write( self.stopD() + self.stopLI() + self.stopNarrower() + u'\\blank[medium] ' + self.newLine() )
-    def renderFS(self, token):      self.f.write( u'\\footnote{' )
-    def renderFE(self, token):      self.f.write( u'} ' )
+    def renderNB(self, token):      self.doNB = True ; self.f.write( self.stopD() + self.stopLI() + self.stopNarrower() + '\\blank[medium] ' + self.newLine() )
+    def renderFS(self, token):      self.f.write( r'\footnote{' )
+    def renderFE(self, token):      self.f.write( '} ' )
     def renderFP(self, token):      self.f.write( self.newLine() )
-    def renderIS(self, token):      self.f.write( u'{\em ' )
-    def renderIE(self, token):      self.f.write( u'} ' )
-    def renderBDS(self, token):     self.f.write( u'{\\bf ')
-    def renderBDE(self, token):     self.f.write( u'} ')
-    def renderBDITS(self, token):   self.f.write( u'{\\bs ')
-    def renderBDITE(self, token):   self.f.write( u'} ')
-    def renderADDS(self, token):    self.f.write( u'{\em ' )
-    def renderADDE(self, token):    self.f.write( u'} ' )
-    def renderNDS(self, token):     self.f.write( u'{\sc ' )
-    def renderNDE(self, token):     self.justDidLORD = True; self.f.write( u'}' )
+    def renderIS(self, token):      self.f.write( r'{\em ' )
+    def renderIE(self, token):      self.f.write( '} ' )
+    def renderBDS(self, token):     self.f.write( r'{\bf ')
+    def renderBDE(self, token):     self.f.write( '} ')
+    def renderBDITS(self, token):   self.f.write( r'{\bs ')
+    def renderBDITE(self, token):   self.f.write( '} ')
+    def renderADDS(self, token):    self.f.write( r'{\em ' )
+    def renderADDE(self, token):    self.f.write( '} ' )
+    def renderNDS(self, token):     self.f.write( r'{\sc ' )
+    def renderNDE(self, token):     self.justDidLORD = True; self.f.write( '}' )
     def renderLI(self, token):      self.f.write( self.startLI() )
     def renderLI1(self, token):      self.f.write( self.startLI() )
     def renderLI2(self, token):      self.f.write( self.startLI() )
     def renderLI3(self, token):      self.f.write( self.startLI() )
     def renderD(self, token):       self.f.write( self.startD() )
     def renderSP(self, token):      self.f.write( self.startD() )
-    def renderPBR(self, token):     self.f.write( u' \\\\ ' )
-    def renderFR(self, token):      self.f.write( u' ' + self.escapeText(token.value) + u' ' )
-    def renderFRE(self, token):     self.f.write( u' ' )
-    def renderFK(self, token):      self.f.write( u' ' + self.escapeText(token.value) + u' ' )
-    def renderFT(self, token):      self.f.write( u' ' + self.escapeText(token.value) + u' ' )
+    def renderPBR(self, token):     self.f.write( ' \\\\ ' )
+    def renderFR(self, token):      self.f.write( ' ' + self.escapeText(token.value) + ' ' )
+    def renderFRE(self, token):     self.f.write( ' ' )
+    def renderFK(self, token):      self.f.write( ' ' + self.escapeText(token.value) + ' ' )
+    def renderFT(self, token):      self.f.write( ' ' + self.escapeText(token.value) + ' ' )
     def renderPI(self, token):      self.renderQ(token)
 
     def renderQSS(self, token):      return
     def renderQSE(self, token):      return
 
     def render_is1(self, token):    self.renderS(token)
-    def render_imt1(self, token):   self.f.write( self.stopLI() + self.stopNarrower() + u'\n\IMT1{' + token.value + u'}\n')
-    def render_imt2(self, token):   self.f.write( self.stopLI() + self.stopNarrower() + u'\n\IMT2{' + token.value + u'}\n')
-    def render_imt3(self, token):   self.f.write( self.stopLI() + self.stopNarrower() + u'\n\IMT3{' + token.value + u'}\n')
+    def render_imt1(self, token):   self.f.write( self.stopLI() + self.stopNarrower() + '\n\\IMT1{' + token.value + '}\n')
+    def render_imt2(self, token):   self.f.write( self.stopLI() + self.stopNarrower() + '\n\\IMT2{' + token.value + '}\n')
+    def render_imt3(self, token):   self.f.write( self.stopLI() + self.stopNarrower() + '\n\\IMT3{' + token.value + '}\n')
     def render_ip(self, token):     self.renderP(token)
     def render_iot(self, token):    self.renderQ(token)
     def render_io1(self, token):    self.renderQ2(token)
     def render_io2(self, token):    self.renderQ2(token)
 
-    closeTeXt = ur"""
+    closeTeXt = r"""
     \stoptext
     """

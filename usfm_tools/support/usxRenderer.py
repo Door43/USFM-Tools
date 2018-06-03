@@ -2,9 +2,10 @@
 #
 
 from __future__ import print_function, unicode_literals
-import abstractRenderer
 import codecs
 import logging
+
+import usfm_tools.support.abstractRenderer as abstractRenderer
 
 #
 #   Simplest renderer. Ignores everything except ascii text.
