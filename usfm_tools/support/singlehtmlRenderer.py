@@ -230,6 +230,11 @@ class SingleHTMLRenderer(AbstractRenderer):
         self.write(u'\n\n<h2 id="{0}-ch-{1}" class="c-num">{2} {3}</h2>'
             .format(self.cb, self.cc, self.chapterLabel, token.value))
 
+    def renderSP(self, token):
+        self.write(u'</p><p class="s-who"><i>')
+    def renderSPA(self, token):
+        self.write(u'</i></p>')
+
     def renderV(self, token):
         self.closeFootnote()
         self.cv = token.value.zfill(3)
